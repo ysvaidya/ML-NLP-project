@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    
+    <style type="text/tailwindcss">
+        h1 {
+
+        }
+        
+        .outfit {
+        font-family: "Outfit", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: <weight>;
+        font-style: normal;
+        }
+
+        .google-sans {
+            font-family: "Google Sans", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: <weight>;
+            font-style: normal;
+            font-variation-settings:
+                "GRAD" 0;
+            }
+
+        .montserrat{
+            font-family: "Montserrat", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: <weight>;
+            font-style: normal;
+            }
+    </style>
+</head>
+<body class = " bg-[#fff4e8]">
+    <header class = "px-6 py-2 bg-white/50 flex gap-16 border-b border-gray-300">
+        <a href="#" class = "flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z" />
+            </svg>
+        <h1 class ="google-sans text-sm font-bold text-[#213C51]">Project NLP</h1>
+
+        </a>
+        <div class="flex gap-3">
+            <a href="#" class ="google-sans text-sm font-bold text-[#213C51]">GitHub</a>
+            <p class ="google-sans text-sm font-bold text-[#213C51]">.</p>
+            <a href="#" class ="google-sans text-sm font-bold text-[#213C51]">Linkedin</a>
+            <p class ="google-sans text-sm font-bold text-[#213C51]">.</p>
+            <a href="#" class ="google-sans text-sm font-bold text-[#213C51]">Methodology</a>
+            <p class ="google-sans text-sm font-bold text-[#213C51]">.</p>
+            <a href="#" class ="google-sans text-sm font-bold text-[#213C51]">About</a>
+
+        </div>
+    </header>
+
+    <main class = "pt-10 px-14 space-y-10">
+        <div class = " flex gap-2">
+            <h1 class = "montserrat text-5xl text-[#213C51]">News</h1>
+            <h1 class = "montserrat text-5xl font-bold text-[#213C51]">Detector</h1>
+        </div>
+
+        <form id="predictionForm" class = "">
+            <textarea id="newsText" rows="5" cols="120" placeholder="Enter news text here..." 
+            class= "google-sans py-4 px-2 appearance-none outline-none border-none rounded-xl shadow-lg placeholder:text-[#213C51]/50 resize-none focus:ring-0 focus:outline-none text-[#213C51] font-semibold transition duration-300"
+            ></textarea>
+            <br><br>
+            <button type="submit" class = "google-sans py-1.5 px-7 text-lg font-semibold text-[#fff4e8] rounded-3xl bg-[#213C51] transition duration-300  ">Check</button>
+        </form>
+
+        <div class = " flex gap-8">
+            <h2 id="result" class = "google-sans text-[#213C51] text-sm font-semibold "></h2>
+            <h3 id="confidence" class = "google-sans text-[#213C51] text-sm font-semibold "></h3>
+        </div>
+    </main>
+    
+
+    <h2 id="result" class = "text-[#213C51] text-2xl font-semibold "></h2>
+    <h3 id="confidence" class = "text-[#213C51] text-2xl font-semibold"></h3>
+
+    <script>
+        document.getElementById("predictionForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const text = document.getElementById("newsText").value;
+
+            fetch("/api/predict/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                body: JSON.stringify({ text: text })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").innerText = 
+                    "Prediction: " + data.data.prediction;
+
+                document.getElementById("confidence").innerText = 
+                    "Confidence: " + data.confidence;
+            })
+            .catch(error => console.error("Error:", error));
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+
+</body>
+</html>
